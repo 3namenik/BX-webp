@@ -1,24 +1,21 @@
 <?
 
-class Webp {
+class Webp
+{
 
 	private static $isPng = true;
 
 	private static function checkFormat($str)
 	{
-		if ($str === 'image/png')
-		{
+		if ($str === 'image/png') {
 			self::$isPng = true;
 
 			return true;
-		}
-		elseif ($str === 'image/jpeg')
-		{
+		} elseif ($str === 'image/jpeg') {
 			self::$isPng = false;
 
 			return true;
-		}
-		else return false;
+		} else return false;
 	}
 
 	private static function implodeSrc($arr)
@@ -32,51 +29,39 @@ class Webp {
 	{
 		$arPath = explode('/', $str);
 
-		if ($arPath[2] === 'resize_cache')
-		{
+		if ($arPath[2] === 'resize_cache') {
 			$arPath = self::implodeSrc($arPath);
 
 			return str_replace('resize_cache/iblock', 'webp/resize_cache', $arPath);
-		}
-		else
-		{
+		} else {
 			$arPath = self::implodeSrc($arPath);
 
 			return str_replace('upload/iblock', 'upload/webp/iblock', $arPath);
 		}
 	}
 
-    public static function getWebp($array, $intQuality = 100)
+	public static function getWebp($array, $intQuality = 100)
 	{
-		if (self::checkFormat($array['CONTENT_TYPE']))
-		{
+		if (self::checkFormat($array['CONTENT_TYPE'])) {
 			$array['WEBP_PATH'] = self::generateSrc($array['SRC']);
 
-			if (self::$isPng)
-			{
+			if (self::$isPng) {
 				$array['WEBP_FILE_NAME'] = str_replace('.png', '.webp', strtolower($array['FILE_NAME']));
-			}
-			else
-			{
+			} else {
 				$array['WEBP_FILE_NAME'] = str_replace('.jpg', '.webp', strtolower($array['FILE_NAME']));
 				$array['WEBP_FILE_NAME'] = str_replace('.jpeg', '.webp', strtolower($array['WEBP_FILE_NAME']));
 			}
 
-			if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $array['WEBP_PATH']))
-			{
+			if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $array['WEBP_PATH'])) {
 				mkdir($_SERVER['DOCUMENT_ROOT'] . $array['WEBP_PATH'], 0777, true);
 			}
 
 			$array['WEBP_SRC'] = $array['WEBP_PATH'] . $array['WEBP_FILE_NAME'];
 
-			if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $array['WEBP_SRC']))
-			{
-				if (self::$isPng)
-				{
+			if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $array['WEBP_SRC'])) {
+				if (self::$isPng) {
 					$im = imagecreatefrompng($_SERVER['DOCUMENT_ROOT'] . $array['SRC']);
-				}
-				else
-				{
+				} else {
 					$im = imagecreatefromjpeg($_SERVER['DOCUMENT_ROOT'] . $array['SRC']);
 				}
 
@@ -84,26 +69,39 @@ class Webp {
 
 				imagedestroy($im);
 
-				if (filesize($_SERVER['DOCUMENT_ROOT'] . $array['WEBP_SRC']) % 2 == 1)
-				{
+				if (filesize($_SERVER['DOCUMENT_ROOT'] . $array['WEBP_SRC']) % 2 == 1) {
 					file_put_contents($_SERVER['DOCUMENT_ROOT'] . $array['WEBP_SRC'], "\0", FILE_APPEND);
 				}
 			}
 		}
 
 		return $array;
-    }
+	}
 
 	public static function resizePict($file, $width, $height, $isProportional = true, $intQuality = 100)
 	{
-		$file = \CFile::ResizeImageGet($file, array('width'=>$width, 'height'=>$height), ($isProportional ? BX_RESIZE_IMAGE_PROPORTIONAL : BX_RESIZE_IMAGE_EXACT), false, false, false, $intQuality);
+		$file = \CFile::ResizeImageGet(
+			$file,
+			array(
+				'width' => $width,
+				'height' => $height
+			),
+			($isProportional ? BX_RESIZE_IMAGE_PROPORTIONAL : BX_RESIZE_IMAGE_EXACT),
+			true,
+			false,
+			false,
+			$intQuality
+		);
 
-		return $file['src'];
+		return $file;
 	}
 
 	public static function getResizeWebp($file, $width, $height, $isProportional = true, $intQuality = 100)
 	{
-		$file['SRC'] = self::resizePict($file, $width, $height, $isProportional, $intQuality);
+		$resizeImg = self::resizePict($file, $width, $height, $isProportional, $intQuality);
+		$file['SRC'] = $resizeImg['src'];
+		$file['WIDTH_RESIZE'] = $resizeImg['width'];
+		$file['HEIGHT_RESIZE'] = $resizeImg['height'];
 
 		$file = self::getWebp($file, $intQuality);
 
@@ -112,12 +110,13 @@ class Webp {
 
 	public static function getResizeWebpSrc($file, $width, $height, $isProportional = true, $intQuality = 100)
 	{
-		$file['SRC'] = self::resizePict($file, $width, $height, $isProportional, $intQuality);
+		$resizeImg = self::resizePict($file, $width, $height, $isProportional, $intQuality);
+		$file['SRC'] = $resizeImg['src'];
+		$file['WIDTH_RESIZE'] = $resizeImg['width'];
+		$file['HEIGHT_RESIZE'] = $resizeImg['height'];
 
 		$file = self::getWebp($file, $intQuality);
 
 		return $file['WEBP_SRC'];
 	}
 }
-
-?>
