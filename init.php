@@ -100,8 +100,8 @@ class Webp
 	{
 		$resizeImg = self::resizePict($file, $width, $height, $isProportional, $intQuality);
 		$file['SRC'] = $resizeImg['src'];
-		$file['WIDTH_RESIZE'] = $resizeImg['width'];
-		$file['HEIGHT_RESIZE'] = $resizeImg['height'];
+		$file['WIDTH'] = $resizeImg['width'];
+		$file['HEIGHT'] = $resizeImg['height'];
 
 		$file = self::getWebp($file, $intQuality);
 
@@ -112,8 +112,8 @@ class Webp
 	{
 		$resizeImg = self::resizePict($file, $width, $height, $isProportional, $intQuality);
 		$file['SRC'] = $resizeImg['src'];
-		$file['WIDTH_RESIZE'] = $resizeImg['width'];
-		$file['HEIGHT_RESIZE'] = $resizeImg['height'];
+		$file['WIDTH'] = $resizeImg['width'];
+		$file['HEIGHT'] = $resizeImg['height'];
 
 		$file = self::getWebp($file, $intQuality);
 
