@@ -1,6 +1,5 @@
 <?
 
-/* Выдает неверные значения height и width в результируещем массиве */
 class Webp
 {
 
@@ -107,17 +106,5 @@ class Webp
 		$file = self::getWebp($file, $intQuality);
 
 		return $file;
-	}
-
-	public static function getResizeWebpSrc($file, $width, $height, $isProportional = true, $intQuality = 100)
-	{
-		$resizeImg = self::resizePict($file, $width, $height, $isProportional, $intQuality);
-		$file['SRC'] = $resizeImg['src'];
-		$file['WIDTH'] = $resizeImg['width'];
-		$file['HEIGHT'] = $resizeImg['height'];
-
-		$file = self::getWebp($file, $intQuality);
-
-		return $file['WEBP_SRC'];
 	}
 }
