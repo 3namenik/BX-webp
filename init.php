@@ -42,7 +42,7 @@ class Webp
 
 	public static function getWebp($array, $intQuality = 100)
 	{
-		if (self::checkFormat($array['CONTENT_TYPE'])) {
+		if (self::checkFormat($array['CONTENT_TYPE']) && function_exists('imagewebp')) {
 			$array['WEBP_PATH'] = self::generateSrc($array['SRC']);
 
 			if (self::$isPng) {
